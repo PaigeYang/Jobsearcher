@@ -96,6 +96,18 @@ Jobsearcher tracks recent job openings from company career pages and surfaces th
 - Alert on sustained crawl failures for a company to avoid stale data.
 - LLM failures fall back to deterministic results; lifecycle rules still apply.
 
+## LLM Usage Controls
+- LLM parsing is invoked only when deterministic extraction is low-confidence.
+- Usage is gated by subscription tier; free users have limited LLM calls while paid tiers allow higher throughput.
+- Bring-your-own-key support can be layered for advanced tiers without changing parsing flow.
+- Deterministic validation (required fields present, URLs valid) always executes after LLM output and can discard malformed results.
+
+## Freshness & Data Hygiene
+- Crawls run twice per day; missed runs trigger requeueing rather than skipping the next window.
+- Closed jobs disappear as soon as they are absent from a crawl result.
+- Expiration deletes jobs older than 30 days using scraped posted date when available, otherwise the first-seen timestamp.
+- Atomic per-company updates prevent partial refreshes from leaking stale jobs to users.
+
 ## Scalability Considerations
 - Queue-based scheduling scales horizontally for crawls.
 - Parsing pipeline is stateless and can run in workers.
